@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tuniu.business.dao.LeaveBillMapper">
+
+	<insert id="add" parameterType="LeaveBill">
+		INSERT INTO bs_leave_bill (
+			<if test="userId!=null and userId!=''">userId,</if>
+			<if test="billType!=null and billType!=''">billType,</if>
+			<if test="days!=null and days!=''">days,</if>
+			<if test="beginDate!=null and beginDate!=''">beginDate,</if>
+			<if test="endDate!=null and endDate!=''">endDate,</if>
+			<if test="remark!=null and remark!=''">remark,</if>
+			delFlag
+		) VALUES(
+			<if test="userId!=null and userId!=''">#{userId},</if>
+			<if test="billType!=null and billType!=''">#{billType},</if>
+			<if test="days!=null and days!=''">#{days},</if>
+			<if test="beginDate!=null and beginDate!=''">#{beginDate},</if>
+			<if test="endDate!=null and endDate!=''">#{endDate},</if>
+			<if test="remark!=null and remark!=''">#{remark},</if>
+			0)
+	</insert>
+	
+	<delete id="delete" parameterType="int">		
+		DELETE FROM bs_leave_bill WHERE id=#{id}
+	</delete>
+	
+	<update id="update" parameterType="LeaveBill">
+		UPDATE bs_leave_bill
+		<set>
+			<if test="billType!=null and billType!=''">billType=#{billType},</if>
+			<if test="days!=null and days!=''">days=#{days},</if>
+			<if test="beginDate!=null and beginDate!=''">beginDate=#{beginDate},</if>
+			<if test="endDate!=null and endDate!=''">endDate=#{endDate},</if>
+			<if test="remark!=null and remark!=''">remark=#{remark},</if>
+			updateTime=CURRENT_TIMESTAMP
+		</set>
+		WHERE id=#{id}
+	</update>
+	
+	<select id="get" parameterType="int" resultType="LeaveBill">
+		SELECT * FROM bs_leave_bill WHERE id = #{id}
+	</select>
+	
+	<select id="count" parameterType="LeaveBillDto" resultType="int">
+		SELECT COUNT(*) FROM bs_leave_bill 
+		<where>
+			<if test="userId!=null and userId!=''">AND userId=#{userId}</if>
+			<if test="billType!=null and billType!=''">AND billType=#{billType}</if>
+			<if test="beginDate!=null and beginDate!=''">AND beginDate=#{beginDate}</if>
+			<if test="endDate!=null and endDate!=''">AND endDate=#{endDate}</if>
+		</where>
+	</select>
+	
+	<select id="list" parameterType="LeaveBillDto" resultMap="LeaveInfo">
+		SELECT t1.*,pids,t3.value FROM bs_leave_bill t1 INNER JOIN sys_user t2 ON t1.userId=t2.id INNER JOIN cm_base_data t3 ON t1.billType=t3.id 
+		<where>
+			<if test="userId!=null and userId!=''"> AND t1.userId=#{userId}</if>
+			<if test="billType!=null and billType!=''"> AND t1.billType=#{billType}</if>
+			<if test="beginDate!=null and beginDate!=''"> AND t1.beginDate=#{beginDate}</if>
+			<if test="endDate!=null and endDate!=''"> AND t1.endDate=#{endDate} </if>
+		</where>
+		ORDER BY addTime desc
+	</select>
+	
+	<resultMap type="LeaveBill" id="LeaveInfo" autoMapping="true">
+		<id property="id" column="id"/>
+		<association property="user" javaType="User">
+			<result column="pids" property="pids"/>
+		</association>
+		<association property="baseData" javaType="BaseData">
+			<result column="value" property="value"/>
+		</association>
+	</resultMap>
+</mapper>

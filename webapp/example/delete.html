@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>删除记录时的提示效果</title>
+<script type="text/javascript" src="./jquery-2.1.3.js"></script>
+<style type="text/css">
+body{font-size:13px;}
+.divShow{line-height:32px;height:32px;background-color:#eee;width:280px;padding-left:10px}
+.divShow span{padding-left:50px;}
+.dialog{width:360px;border:solid 5px #666;position:absolute;display:none;z-index:101}
+.dialog .title{background-color:#fbaf15;padding:10px;color:#fff;font-weight:bold}
+.dialog .title img{float:right}
+.dialog .content{background-color:#fff;padding:25px;height:60px}
+.dialog .content img{float:left}
+.dialog .content span{float:left;padding-top:10px;padding-left:10px}
+.dialog .bottom{text-align:right;padding:10px 10px 10px 0;background-color:#eee}
+.mask{width:100%;height:100%;background-color:#000;position:absolute;top:0px;left:0px;
+filter:alpha(opacity=30);display:none;z-index:100}
+.btn{border:#666 1px solid;padding:2px;width:65px;filter:progid:DXImageTransform.Mircrosoft.Gradient(
+GradientType=0,StartColorStr=#fff,EndColorStr=#ece9d8);}
+
+</style>
+<script type="text/javascript">
+$(function(){
+	$("#button1").click(function(){
+		$(".mask").show();
+		setDialog();
+		$(".dialog").show();
+	});
+	function setDialog(){
+		var objW = $(window);
+		var objC = $(".dialog");
+		var brsW = objW.width();
+		var brsH = objW.height();
+		var sclL = objW.scrollLeft();
+		var sclT = objW.scrollTop();
+		var curW = objC.width();
+		var curH = objC.height();
+		var left = sclL + (brsW-curW)/2;
+		var top = sclT + (brsH-curH)/2;
+		objC.css({"left":left,"top":top});
+	}
+	$(window).resize(function(){
+		if(!$(".dialog").is(":visible")){
+			return;
+		}
+		setDialog();
+	});
+	$(".title img").click(function(){
+		$(".dialog").hide();
+		$(".mask").hide();
+	});
+	$("#button3").click(function(){
+		$(".dialog").hide();
+		$(".mask").hide();
+	});
+	$("#button2").click(function(){
+		$(".dialog").hide();
+		$(".mask").hide();
+		if($("input:checked").length!=0){
+			$(".divShow").remove();
+		}
+	});
+});
+</script>
+</head>
+<body>
+<div class="divShow">
+	<input id="checkbox1" type="checkbox"/><a href="#">删除</a>
+	<span><input id="button1" type="button" value="删除" class="btn"/></span>
+</div>
+<div class="mask"/>
+<div class="dialog">
+	<div class="title">
+		<img alt="关闭"/>删除时提示
+	</div>
+	<div class="content"><img alt=""/><span>确定删除该记录吗？</span></div>
+	<div class="bottom">
+		<input id="button2" type="button" value="确定" class="btn"/>
+		<input id="button3" type="button" value="取消" class="btn"/>
+	</div>
+</div>
+</body>
+</html>

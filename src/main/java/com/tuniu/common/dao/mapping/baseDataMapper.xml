@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tuniu.common.dao.BaseDataMapper">
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>	
+    <insert id="add" parameterType="BaseData">
+        INSERT INTO cm_base_data(
+             <if test="key!=null">`key`,</if>
+             <if test="value!=null and value!=''">value,</if>
+             <if test="seq!=null and seq!=''">seq,</if>
+             <if test="url!=null and url!=''">url,</if>
+             <if test="addPerson!=null">addPerson</if>
+        )VALUES(
+             <if test="key!=null">#{key},</if>
+             <if test="value!=null and value!=''">#{value},</if>
+             <if test="seq!=null and seq!=''">#{seq},</if>
+             <if test="url!=null and url!=''">#{url},</if>
+             <if test="addPerson!=null">#{addPerson}</if>
+        )
+    </insert>
+    
+    <select id="get" parameterType="Integer" resultType="BaseData">
+         SELECT id,`key`,value,seq,url,addPerson,addTime,updatePerson,updateTime,delFlag FROM cm_base_data
+         WHERE id=#{id}
+    </select>
+    
+    <select id="checkExists" parameterType="BaseData" resultType="int">
+         SELECT count(1) FROM cm_base_data
+         WHERE `key`=#{key} and value=#{value}
+    </select>
+    
+     <delete id="delete" parameterType="Integer">
+         DELETE FROM cm_base_data
+         WHERE id=#{id}
+    </delete>
+    
+    <select id="listBaseData" parameterType="BaseDataDto" resultType="BaseData">
+        SELECT id,`key`,value,seq,url,addPerson,addTime,updatePerson,updateTime,delFlag FROM cm_base_data
+        <where>
+            <if test="key!=null and key!=''">AND `key`=#{key}</if>
+            <if test="delFlag!=null and delFlag!=-1 or delFlag==0">AND delFlag=#{delFlag}</if>
+        </where>
+        ORDER BY `key`,seq , addTime desc 
+        <if test="dataLimitStart != null">
+            limit #{dataLimitStart}
+            <if test="pageSize != null">
+                ,#{pageSize}
+            </if>
+        </if>
+    </select>
+    
+    <update id="update" parameterType="BaseData" flushCache="true" statementType="PREPARED">
+        UPDATE cm_base_data
+        <set>
+            <if test="key!=null and key!=''">`key`=#{key},</if>
+            <if test="value!=null and value!=''">value=#{value},</if>
+            <if test="seq!=null and seq!=''">seq=#{seq},</if>
+            <if test="url!=null and url!=''">url=#{url},</if>
+            <if test="updatePerson!=null">updatePerson=#{updatePerson},</if>
+            <if test="delFlag!=null">delFlag=#{delFlag},</if>
+            updateTime=CURRENT_TIMESTAMP
+        </set>
+        WHERE id=#{id}
+    </update>
+    
+    <select id="count" parameterType="BaseDataDto" resultType="Integer">
+        SELECT count(1) FROM cm_base_data 
+        <where>
+            <if test="key!=null and key!=''">AND `key`=#{key}</if>
+            <if test="delFlag!=null and delFlag!=-1 or delFlag==0">AND delFlag=#{delFlag}</if>
+        </where>
+    </select>      
+    
+    <select id="getNameByKey" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT a.value AS name FROM cm_base_data a WHERE a.key = #{key} AND a.delFlag =0        
+    </select>
+    
+    <select id="list" parameterType="BaseDataDto" resultType="BaseData">
+    	SELECT id,value,url FROM cm_base_data
+    	<where>
+    		<if test="key!=null and key!=''">AND `key`=#{key}</if>
+            <if test="delFlag!=null and delFlag!=-1 or delFlag==0">AND delFlag=#{delFlag}</if>
+    	</where>
+    </select>   
+</mapper>

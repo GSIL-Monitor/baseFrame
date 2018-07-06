@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tuniu.cms.dao.ArticleMapper">
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+	
+	<insert id="add">
+		INSERT INTO cms_article(
+             <if test="typeId!=null and typeId!=''">typeId,</if>
+             <if test="cid!=null and cid!=''">cid,</if>
+             <if test="title!=null and title!=''">title,</if>
+             <if test="summary!=null and summary!=''">summary,</if>
+             <if test="content!=null and content!=''">content,</if>
+             <if test="hits!=null and hits!=''">hits,</if>
+             <if test="available!=null and available!=''">available,</if>
+             <if test="addPerson!=null">addPerson,</if>
+             addTime
+        )VALUES(
+             <if test="typeId!=null and typeId!=''">#{typeId},</if>
+             <if test="cid!=null and cid!=''">#{cid},</if>
+             <if test="title!=null and title!=''">#{title},</if>
+             <if test="summary!=null and summary!=''">#{summary},</if>
+             <if test="content!=null and content!=''">#{content},</if>
+             <if test="hits!=null and hits!=''">#{hits},</if>
+             <if test="available!=null and available!=''">#{available},</if>
+             <if test="addPerson!=null">#{addPerson},</if>
+             CURRENT_TIMESTAMP
+        )
+	</insert>
+	
+	
+	
+	<update id="update" parameterType="Article" >
+		update cms_article 
+		<set>
+             <if test="typeId!=null and typeId!=''">typeId=#{typeId},</if>
+             <if test="cid!=null and cid!=''">cid=#{cid},</if>
+             <if test="title!=null and title!=''">title=#{title},</if>
+             <if test="summary!=null and summary!=''">summary=#{summary},</if>
+             <if test="content!=null and content!=''">content=#{content},</if>
+             <if test="hits!=null and hits!=''">hits=#{hits},</if>
+             <if test="available!=null and available!=''">available=#{available},</if>
+             <if test="addPerson!=null">addPerson=#{addPerson},</if>
+             <if test="updatePerson!=null">updatePerson=#{updatePerson},</if>
+             updateTime=CURRENT_TIMESTAMP
+        </set>
+        where id=#{id}
+	</update>
+	
+	<select id="get" parameterType="Integer" resultType="Article">
+		select * from cms_article where id=#{id}
+	</select>
+	
+	<select id="count" parameterType="ArticleDto" resultType="int">
+		select count(*) from cms_article where typeId=#{typeId} and cid=#{cid}
+	</select>
+	
+	<select id="list" parameterType="ArticleDto" resultType="Article">
+		select id,title,summary,content,hits,available,addPerson,addTime from cms_article where typeId=#{typeId} and cid=#{cid} 
+		order by addTime desc
+		<if test="dataLimitStart!=null">
+			limit #{dataLimitStart}
+			<if test="pageSize!=null">
+				,#{pageSize}
+			</if>
+		</if> 
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from cms_article where id=#{id}
+	</delete>
+</mapper>

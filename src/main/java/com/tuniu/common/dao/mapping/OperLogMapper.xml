@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tuniu.common.dao.OperLogMapper">
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>	
+    <insert id="add" parameterType="OperLog">
+        INSERT INTO cm_oper_log(
+            <if test="clientIP!=null">clientIP,</if>
+            <if test="operatorId!=null and operatorId!=''">operatorId,</if>
+            <if test="operatorName!=null and operatorName!=''">operatorName,</if>
+            <if test="resName!=null">resName,</if>
+            <if test="requestUri!=null">requestUri,</if>
+            <if test="requestArgs!=null">requestArgs,</if>
+            delFlag
+        )VALUES(
+            <if test="clientIP!=null">#{clientIP},</if>
+            <if test="operatorId!=null and operatorId!=''">#{operatorId},</if>
+            <if test="operatorName!=null and operatorName!=''">#{operatorName},</if>
+            <if test="resName!=null">#{resName},</if>
+            <if test="requestUri!=null">#{requestUri},</if>
+            <if test="requestArgs!=null">#{requestArgs},</if>
+            0
+        )
+    </insert>
+    
+    <select id="get" parameterType="Integer" resultType="OperLog">
+         SELECT * FROM cm_oper_log
+         WHERE id=#{id}
+    </select>   
+  
+    
+    <select id="list" parameterType="OperLogDto" resultType="OperLog">
+        SELECT * FROM cm_oper_log
+        <where>
+            <if test="clientIP!=null and clientIP!=''">AND clientIP=#{clientIP}</if>
+            <if test="operatorName!=null and operatorName!=''">AND operatorName=#{operatorName}</if>
+            <if test="resName!=null and resName!=''">AND resName=#{resName}</if>
+            <if test="requestUri!=null and requestUri!=''">AND requestUri=#{requestUri}</if>
+            <if test="requestArgs!=null">AND requestArgs=#{requestArgs}</if>
+            <if test="addTime!=null">AND addTime=#{addTime}</if>
+        </where>
+        ORDER BY addTime desc 
+        <if test="dataLimitStart != null">
+            limit #{dataLimitStart}
+            <if test="pageSize != null">
+                ,#{pageSize}
+            </if>
+        </if>
+    </select>
+    
+    <select id="count" parameterType="OperLogDto" resultType="Integer">
+        SELECT count(1) FROM cm_oper_log 
+        <where>
+            <if test="clientIP!=null and clientIP!=''">AND clientIP=#{clientIP}</if>
+            <if test="operatorName!=null and operatorName!=''">AND operatorName=#{operatorName}</if>
+            <if test="resName!=null and resName!=''">AND resName=#{resName}</if>
+            <if test="requestUri!=null and requestUri!=''">AND requestUri=#{requestUri}</if>
+            <if test="requestArgs!=null">AND requestArgs=#{requestArgs}</if>
+            <if test="addTime!=null">AND addTime=#{addTime}</if>
+        </where>
+    </select>      
+    
+      
+</mapper>

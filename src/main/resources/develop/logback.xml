@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>%date %-5level [%c{0}.%M:%L] - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/logs/baseFrame-log.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>/logs/baseFrame-log.%d{yyyy-MM-dd}.log</FileNamePattern>
+		</rollingPolicy>
+		<layout>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n</Pattern>
+		</layout>
+	</appender>
+
+	<logger name="org.apache.mina.filter.codec" level="ERROR" additivity="false"/>
+	
+	<logger name="com.tuniu" level="DEBUG" additivity="true">
+		<appender-ref ref="STDOUT"/>
+	</logger>
+
+	<root level="ERROR">		
+		<appender-ref ref="FILE"/>
+	</root>
+</configuration>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tuniu.common.dao.UserMapper">
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache">
+		<property name="timeToIdleSeconds" value="3600"/><!--1 hour-->  
+	    <property name="timeToLiveSeconds" value="3600"/><!--1 hour-->  
+	    <property name="maxEntriesLocalHeap" value="1000"/>  
+	    <property name="maxEntriesLocalDisk" value="10000000"/>  
+	    <property name="memoryStoreEvictionPolicy" value="LRU"/>
+	</cache>
+	<insert id="add" parameterType="User" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" >
+		INSERT INTO sys_user (			
+			<if test="usercode != null">usercode,</if>
+			<if test="username != null">username,</if>
+			<if test="password != null">password,</if>
+			<if test="salt != null">salt,</if>
+			<if test="locked != null">locked,</if>	
+			<if test="pids != null">pids,</if>	
+			updateTime
+		) VALUES (
+			<if test="usercode != null">#{usercode},</if>
+			<if test="username != null">#{username},</if>
+			<if test="password != null">#{password},</if>
+			<if test="salt != null">#{salt},</if>
+			<if test="locked != null">#{locked},</if>
+			<if test="pids != null">#{pids},</if>
+			CURRENT_TIMESTAMP
+		)
+	</insert>
+	
+	<insert id="addUserRoleRelation" parameterType="UserDto">
+		INSERT INTO sys_user_role (sys_user_id,sys_role_id) VALUES (
+			#{id,jdbcType=VARCHAR},#{roleId,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM sys_user WHERE id=#{id}
+	</delete>
+	
+	<update id="update" parameterType="User" flushCache="true" statementType="PREPARED">
+		UPDATE sys_user 
+		<set>
+			<if test="usercode != null">usercode=#{usercode},</if>
+			<if test="username != null">username=#{username},</if>
+			<if test="password != null">password=#{password},</if>
+			<if test="pids != null">pids=#{pids},</if>
+			<if test="locked != null">locked=#{locked},</if>
+			updateTime=CURRENT_TIMESTAMP
+		</set>
+		where id=#{id}
+	</update>
+	
+	<delete id="revokeRole" parameterType="User" >
+		DELETE FROM sys_user_role WHERE sys_user_id=#{id}
+	</delete>
+	
+	<insert id="assignRole" parameterType="User">
+		INSERT INTO sys_user_role (sys_user_id,sys_role_id) VALUES (#{id},#{roleId})
+	</insert>
+
+	<select id="get" parameterType="Integer" resultType="User" >
+		SELECT * FROM sys_user WHERE id=#{id}
+	</select>
+	
+	<select id="getUserByName" parameterType="String" resultType="User">
+		SELECT * FROM sys_user WHERE usercode=#{usercode} 
+	</select>
+	
+	
+	<select id="getRolesByUserId" parameterType="Integer" resultType="String" useCache="false">
+		SELECT sys_role_id FROM sys_user_role WHERE sys_user_id=#{id} 
+	</select>
+	
+	<select id="getUserRolesByUserId" parameterType="Integer" resultType="Role" useCache="false">
+		SELECT name,type FROM sys_role t1 INNER JOIN sys_user_role t2 ON t1.id=t2.sys_role_id WHERE t2.sys_user_id=#{id} ORDER BY t1.type
+	</select>
+	
+	
+	<select id="countUserRole" parameterType="UserDto" resultType="Integer" useCache="false">
+		SELECT COUNT(*) FROM sys_user t1   
+		<where>
+			<if test="username!=null and username!=''">AND t1.username =#{username}</if>
+			<if test="roleId!=null and roleId!=''">AND t1.id IN 
+			(SELECT t3.sys_user_id FROM sys_role t2,sys_user_role t3 WHERE t2.id=t3.sys_role_id AND t2.id=#{roleId})</if>
+			<if test="roleType!=null and roleType!=''">AND t1.id IN 
+			(SELECT t3.sys_user_id FROM sys_role t2,sys_user_role t3 WHERE t2.id=t3.sys_role_id AND t2.type=#{roleType})</if>
+		</where>
+	</select>
+	
+	<select id="listUserRole" parameterType="UserDto" resultType="User" useCache="false">
+		SELECT t1.*  FROM sys_user t1   
+		<where>
+			<if test="username!=null and username!=''">AND t1.username =#{username}</if>
+			<if test="roleId!=null and roleId!=''">AND t1.id IN 
+			(SELECT t3.sys_user_id FROM sys_role t2,sys_user_role t3 WHERE t2.id=t3.sys_role_id AND t2.id=#{roleId})</if>
+			<if test="roleType!=null and roleType!=''">AND t1.id IN 
+			(SELECT t3.sys_user_id FROM sys_role t2,sys_user_role t3 WHERE t2.id=t3.sys_role_id AND t2.type=#{roleType})</if>
+		</where>
+		<if test="dataLimitStart != null">
+			limit #{dataLimitStart}
+			<if test="pageSize != null">
+				,#{pageSize}
+			</if>
+		</if>
+	</select>
+	
+	<select id="list" parameterType="UserDto" resultType="User" useCache="false">
+		SELECT * FROM sys_user 
+		<where>
+			locked=0
+			<if test="id!=null and id!=''"> AND id=#{id}</if>
+		</where>
+	</select>
+	
+	<!-- 根据用户名得到拥有的所有资源 -->
+	<select id="getResByUserName" parameterType="String" resultType="Resource" useCache="false">
+	SELECT DISTINCT t3.name,t3.percode,t3.type,t3.url,parentid pid,t3.id FROM sys_permission t3 INNER JOIN sys_role_permission t4 ON t3.id=t4.sys_permission_id 
+		INNER JOIN sys_role t5 ON t4.sys_role_id=t5.id WHERE t3.available=1 AND t5.available=1 AND  
+		t5.id IN(
+		SELECT t2.sys_role_id FROM sys_user t1 INNER JOIN sys_user_role t2 ON t1.id=t2.sys_user_id 
+			WHERE t1.usercode=#{username} AND t1.locked=0) ORDER BY t3.sortstring 	
+	</select>
+
+</mapper>

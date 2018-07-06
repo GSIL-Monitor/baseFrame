@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tuniu.common.dao.RoleMapper">
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+	<insert id="add" parameterType="Role">
+		INSERT INTO sys_role (
+			<if test="name != null">name,</if>
+			<if test="type != null">type,</if>
+			<if test="addPerson != null">addPerson,</if>
+			available
+		) VALUES (
+			<if test="name != null">#{name},</if>
+			<if test="type != null">#{type},</if>
+			<if test="addPerson != null">#{addPerson},</if>
+			#{available}
+		)
+	</insert>
+	
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM sys_role WHERE id=#{id}
+	</delete>
+	
+	<select id="checkRelation" parameterType="Integer" resultType="Integer">
+		SELECT COUNT(*) FROM sys_user_role WHERE sys_role_id=#{roleId}	
+	</select>
+	
+	<update id="update" parameterType="Role" flushCache="true" statementType="PREPARED">
+		UPDATE sys_role 
+		<set>
+			<if test="name != null">name=#{name},</if>
+			<if test="type != null">type=#{type},</if>
+			<if test="updatePerson != null">updatePerson=#{updatePerson},</if>
+			<if test="available != null">available=#{available},</if>
+			updateTime=CURRENT_TIMESTAMP
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="get" parameterType="Integer" resultMap="roleMap">
+		SELECT * FROM sys_role WHERE id=#{id}
+	</select>
+	
+	<select id="list" parameterType="RoleDto" resultMap="roleMap">
+		SELECT * FROM sys_role 
+		<where>
+			<if test="name != null">name=#{name}</if>		
+			<if test="available != null">available=#{available}</if>		
+		</where>
+	</select>
+	
+	<resultMap type="Role" id="roleMap">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="addPerson" property="addPerson" />
+		<result column="addTime" property="addTime" />
+		<result column="updatePerson" property="updatePerson" />
+		<result column="updateTime" property="updateTime" />
+		<result column="available" property="available" />
+	</resultMap>
+	
+	<delete id="deleteResources" parameterType="Integer">
+		DELETE FROM sys_role_permission WHERE sys_role_id=#{id}
+	</delete>
+	
+	<insert id="addResources" useGeneratedKeys="true" parameterType="java.util.List" flushCache="true" statementType="PREPARED">
+		INSERT INTO sys_role_permission (sys_role_id, sys_permission_id) VALUES 
+		<foreach collection="list" item="e" index="index" separator=",">
+        (
+			#{e.roleId},
+			#{e.resId}
+        )
+        </foreach>
+    </insert>
+    
+</mapper>

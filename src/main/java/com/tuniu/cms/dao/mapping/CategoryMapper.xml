@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tuniu.cms.dao.CategoryMapper">
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+
+	<sql id="getCategorySql">
+		SELECT
+		  t1.id,
+		  t2.id         AS `category.id`,
+		  t2.value      AS `category.value`,
+		  t1.name,
+		  t1.icon,
+		  t1.url,
+		  t1.parentid,
+		  t1.parentids,
+		  t1.sortstring,
+		  t1.available
+		FROM cms_category t1,
+		  cm_base_data t2
+		WHERE t1.typeId = t2.id 
+	</sql>
+	
+	<select id="getCategoryList" resultType="Category" useCache="false">
+		 <include refid="getCategorySql"/>
+		 AND t1.typeId=#{cid} ORDER BY t1.sortstring
+	</select>	
+	
+	<select id="getCategory" resultType="Category" useCache="false">
+		 <include refid="getCategorySql"/>
+		 AND t1.typeId=#{cid} and t1.id=#{id}
+	</select>
+	
+	<delete id="deleteCategory">
+		DELETE FROM cms_category WHERE id=#{id}
+	</delete>
+	
+	<update id="updateCategory" parameterType="Category" flushCache="true" statementType="PREPARED">
+		UPDATE cms_category 
+		<set>
+			<if test="name != null">name=#{name},</if>
+			<if test="icon != null">icon=#{icon},</if>
+			<if test="url != null">url=#{url},</if>
+			<if test="parentids != null">parentids=#{parentids},</if>			
+			<if test="sortstring != null">sortstring=#{sortstring},</if>
+			<if test="available != null">available=#{available},</if>			
+			parentid=#{parentid}
+		</set>	
+		where id=#{id} and typeId=#{cid}
+	</update>
+	
+	<insert id="addCategory" parameterType="Category" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO cms_category (
+			<if test="cid != null">typeId,</if>
+			<if test="name != null">name,</if>
+			<if test="icon != null">icon,</if>
+			<if test="url != null">url,</if>
+			<if test="parentids != null">parentids,</if>			
+			<if test="sortstring != null">sortstring,</if>
+			<if test="available != null">available,</if>			
+			parentid	
+		) VALUES (
+			<if test="cid != null">#{cid},</if>
+			<if test="name != null">#{name},</if>
+			<if test="icon != null">#{icon},</if>
+			<if test="url != null">#{url},</if>
+			<if test="parentids != null">#{parentids},</if>			
+			<if test="sortstring != null">#{sortstring},</if>
+			<if test="available != null">#{available},</if>
+			#{parentid}
+		)
+	</insert>
+	
+	<select id="getAllCategoryList" resultType="Category" useCache="false">
+		<include refid="getCategorySql"/>
+		ORDER BY t1.sortstring
+	</select>
+	
+	<select id="checkCategoryRelation" parameterType="Integer" resultType="Integer" useCache="false">
+		SELECT COUNT(*) FROM cms_article WHERE cid=#{id}
+	</select>
+</mapper>

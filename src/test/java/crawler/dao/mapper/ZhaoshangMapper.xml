@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="crawler.dao.ZhaoshangMapper">
+
+	<insert id="add" parameterType="crawler.model.Site">
+		insert ignore into company_zhaoshang100 (
+			 <if test="name!=null"> name,</if>
+			 <if test="website!=null"> web_site,</if>
+			 <if test="province!=null"> province,</if>
+			 <if test="city!=null"> city,</if>
+			 <if test="address!=null"> address,</if>
+			 <if test="corporateRepresentative!=null"> corporate_representative,</if>
+			 <if test="registeredCapital"> registered_capital,</if>
+			 <if test="buildDate!=null"> build_date,</if>
+			 <if test="category!=null"> category,</if>
+			 <if test="nature!=null"> nature,</if>
+			 <if test="populationSize!=null"> population_size,</if>
+			 <if test="registrationNumber!=null"> registration_number,</if>
+			 <if test="organiztionCode!=null"> organiztion_code,</if>
+			 <if test="uniformCreditNo!=null"> uniform_credit_no,</if>
+			 <if test="keyword!=null"> keyword,</if>
+			 <if test="phone!=null"> phone,</if>
+			 <if test="remark!=null"> remark,</if>
+			 <if test="email!=null"> email,</if>
+			 <if test="source!=null"> source,</if>
+			 <if test="additional!=null"> additional,</if>
+			  delFlag
+		) values (
+			 <if test="name!=null"> #{name},</if>
+			 <if test="website!=null"> #{website},</if>
+			 <if test="province!=null"> #{province},</if>
+			 <if test="city!=null"> #{city},</if>
+			 <if test="address!=null"> #{address},</if>
+			 <if test="corporateRepresentative!=null"> #{corporateRepresentative},</if>
+			 <if test="registeredCapital"> #{registeredCapital},</if>
+			 <if test="buildDate!=null"> #{buildDate},</if>
+			 <if test="category!=null"> #{category},</if>
+			 <if test="nature!=null"> #{nature},</if>
+			 <if test="populationSize!=null"> #{populationSize},</if>
+			 <if test="registrationNumber!=null"> #{registrationNumber},</if>
+			 <if test="organiztionCode!=null"> #{organiztionCode},</if>
+			 <if test="uniformCreditNo!=null"> #{uniformCreditNo},</if>
+			 <if test="keyword!=null"> #{keyword},</if>
+			 <if test="phone!=null"> #{phone},</if>
+			 <if test="remark!=null"> #{remark},</if>
+			 <if test="email!=null"> #{email},</if>
+			 <if test="source!=null"> #{source},</if>
+			 <if test="additional!=null"> #{additional},</if>
+			  delFlag
+		)
+	</insert>
+</mapper>

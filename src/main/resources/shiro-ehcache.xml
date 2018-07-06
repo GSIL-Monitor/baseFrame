@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="GB2312"?>  
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+   xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">  
+    <!--diskStore：缓存数据持久化的目录 地址  -->
+    <!--    maxElementsInMemory缓存最大个数 
+		    maxElementsOnDisk硬盘最大缓存个数 
+		    eternal对象是否永久有效 
+		    memoryStoreEvictionPolicy默认策略是LRU（最近最少使用） -->
+	<diskStore path="java.io.tmpdir" />
+	<defaultCache 
+		maxElementsInMemory="1000" 
+		maxElementsOnDisk="10000000" 
+		eternal="false"
+		overflowToDisk="false" 
+		diskPersistent="false"
+		timeToIdleSeconds="120"
+		timeToLiveSeconds="120" 
+		diskExpiryThreadIntervalSeconds="120"
+		memoryStoreEvictionPolicy="LRU"> 
+	</defaultCache>
+</ehcache> 

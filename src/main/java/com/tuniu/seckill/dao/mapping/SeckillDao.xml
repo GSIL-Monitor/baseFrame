@@ -1,0 +1,25 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对于SeckillDAO使用MyBatis的API方式进行实现 -->
+<mapper namespace="com.tuniu.seckill.dao.SeckillDao">
+	<select id="queryByOffset" resultType="SecKill">
+		select seckill_id as seckillId,name,number,start_time as startTime,
+		end_time as endTime,create_time as createTime from seckill order by create_time desc limit #{offset},#{limit}
+	</select>
+	
+	<select id="queryById" parameterType="long" resultType="SecKill">
+		select seckill_id as seckillId,name,number,start_time as startTime,
+		end_time as endTime,create_time as createTime from seckill 
+		where seckill_id=#{seckillId}
+	</select>
+	
+	<update id="reduceNumber">
+		update seckill set number=number-1 where seckill_id=#{seckillId}
+		<![CDATA[
+			and start_time<=#{killTime}
+			and end_time>=#{killTime}
+			and number>0
+		]]>
+	</update>
+</mapper>

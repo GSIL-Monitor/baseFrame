@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuniu.upload.dao.UploadDao">
+
+	<insert id="add" parameterType="Upload">
+		INSERT INTO `file_upload`(
+			`typeId`,
+			`categoryId`,
+			`file_name`,
+			`file_type`,
+			`file_size`,
+			`url`) VALUES (
+			#{typeId},#{categoryId},#{fileName},#{fileType},#{fileSize},#{url}
+		)
+	</insert>
+	
+	<delete id="delete">
+		delete from file_upload where id=#{id}
+	</delete>
+	
+	<update id="update"></update>
+	
+	<select id="get" resultType="Upload">
+		SELECT id,file_name fileName,file_type fileType,file_size fileSize,url,upload_time uploadTime FROM file_upload where id=#{id}
+	</select>
+	
+	<select id="count" parameterType="UploadDto" resultType="int">
+		SELECT COUNT(*) FROM file_upload 
+		<where>
+			<if test="file_name!=null and file_name!=''">AND file_name=#{file_name}</if>
+			<if test="max_size!=null and max_size!=''">AND file_size&lt;#{max_size}</if>
+			<if test="min_size!=null and min_size!=''">AND file_size&gt;#{min_size}</if>
+			<if test="typeId!=null and typeId!=''">AND typeId = #{typeId}</if>
+			<if test="categoryId!=null and categoryId!=''">AND categoryId = #{categoryId}</if>
+		</where>
+		
+	</select>
+	
+	<select id="list" parameterType="UploadDto" resultType="Upload">
+		SELECT id,file_name fileName,file_type fileType,file_size fileSize,url,upload_time uploadTime FROM file_upload
+		<where>
+			<if test="file_name!=null and file_name!=''">AND file_name = #{file_name}</if>
+			<if test="max_size!=null and max_size!=''">AND file_size &lt; #{max_size}</if>
+			<if test="min_size!=null and min_size!=''">AND file_size &gt; #{min_size}</if>
+			<if test="typeId!=null and typeId!=''">AND typeId = #{typeId}</if>
+			<if test="categoryId!=null and categoryId!=''">AND categoryId = #{categoryId}</if>
+		</where>
+		 
+		<if test="orderName!=null and orderName!=''">ORDER BY ${orderName}</if>
+		<if test="orderSize!=null and orderSize!=''">ORDER BY ${orderSize}</if>
+		<if test="orderType!=null and orderType!=''">ORDER BY ${orderType}</if>
+		<if test="orderUrl!=null and orderUrl!=''">ORDER BY ${orderUrl}</if>
+		<if test="orderTime!=null and orderTime!=''">ORDER BY ${orderTime}</if>
+		<if test="dataLimitStart != null">
+            limit #{dataLimitStart}
+            <if test="pageSize != null">
+                ,#{pageSize}
+            </if>
+        </if>
+	</select>
+</mapper>
